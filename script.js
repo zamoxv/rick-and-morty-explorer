@@ -2,12 +2,14 @@ const API_URL = "https://rickandmortyapi.com/api/character";
 
 let currentPage = 1;
 let maxPage = 1; 
+let currentSearch = "";
 
 const cardsContainer = document.getElementById("cards");
 const statusEl = document.getElementById("status");
 const pageInfoEl = document.getElementById("page-info");
 const prevBtn = document.getElementById("prev-btn");
 const nextBtn = document.getElementById("next-btn");
+const searchInput = document.getElementById("search-input");
 
 document.addEventListener("DOMContentLoaded", () =>{
     loadPage(currentPage);
@@ -24,6 +26,14 @@ document.addEventListener("DOMContentLoaded", () =>{
             loadPage(currentPage);
         }
     });
+    searchInput.addEventListener("keydown", (event) => {
+        if(event.key === "Enter"){
+            const value = searchInput.value.trim();
+            currentSearch = value;
+            currentPage = 1;
+            loadPage(currentPage);
+        }
+    })
 });
 
 async function loadPage(page) {
@@ -31,7 +41,20 @@ async function loadPage(page) {
     cardsContainer.innerHTML = "";
 
     try{
-        const res = await fetch(`${API_URL}?page=${page}`);
+        let url = `${API_URL}?page=${page}`;
+        if(currentSearch){
+            url += `&name=${encodeURIComponent(currentSearch)} `;
+        }
+
+        const res = await fetch(url);
+
+        if(res.status === 404){
+            cardsContainer.innerHTML = "";
+            statusEl.textContent = "No se encontraron personajes para mostrar";
+            pageInfoEl.textContent = "Sin resultados";
+            return;
+        }
+
         if(!res.ok){
             throw new Error("Error al obtener datos de la API");
         }
