@@ -34,6 +34,15 @@ document.addEventListener("DOMContentLoaded", () =>{
             loadPage(currentPage);
         }
     })
+    searchInput.addEventListener("input", () => {
+        const value = searchInput.value.trim();
+
+        if(value === ""){
+            currentSearch = "";
+            currentPage = 1;
+            loadPage(currentPage);
+        }
+    })
 });
 
 async function loadPage(page) {
